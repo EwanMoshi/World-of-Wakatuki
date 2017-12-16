@@ -30,7 +30,7 @@ private:
 	UTankTrack* LeftTrack = nullptr;
 	UTankTrack* RightTrack = nullptr;
 
-	// called rom pathfinding logic by the AIController
+	// called from pathfinding logic by the AIController
 	virtual void RequestDirectMove(const FVector& MoveVelocity, bool bForceMaxSpeed) override;
 
 
