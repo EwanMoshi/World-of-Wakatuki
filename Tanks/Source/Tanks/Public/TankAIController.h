@@ -18,4 +18,7 @@ class TANKS_API ATankAIController : public AAIController
 public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+
+private:
+	float AcceptanceRadius = 3000.0f;
 };
