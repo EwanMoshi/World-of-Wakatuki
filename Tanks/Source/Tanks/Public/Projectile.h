@@ -7,6 +7,8 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
+class UParticleSystemComponent;
+
 UCLASS()
 class TANKS_API AProjectile : public AActor
 {
@@ -21,10 +23,17 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 	void LaunchProjectile(float speed);
 
 private:
-	UProjectileMovementComponent * ProjectileMovement = nullptr;
+	UProjectileMovementComponent* ProjectileMovement = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UStaticMeshComponent* CollisionMesh = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UParticleSystemComponent* LaunchBlast = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UParticleSystemComponent* ImpactBlast = nullptr;
 };
