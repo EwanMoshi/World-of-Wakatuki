@@ -24,7 +24,11 @@ void UTankAimingComponent::BeginPlay() {
 }
 
 void UTankAimingComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) {
-	if ((FPlatformTime::Seconds() - LastFireTime) < ReloadTime_S) {
+	
+	if (RoundsLeft <= 0) {
+		FiringState = EFiringState::OUT_OF_AMMO;
+	}
+	else if ((FPlatformTime::Seconds() - LastFireTime) < ReloadTime_S) {
 		FiringState = EFiringState::RELOADING;
 	}
 	else if (IsBarrelMoving()) {
@@ -32,9 +36,7 @@ void UTankAimingComponent::TickComponent(float DeltaTime, enum ELevelTick TickTy
 	}
 	else {
 		FiringState = EFiringState::LOCKED;
-
 	}
-
 }
 
 void UTankAimingComponent::Initialise(UTankBarrel* BarrelToSet, UTankTurret* TurretToSet) {
@@ -71,7 +73,7 @@ void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection) {
 	Barrel->Elevate(DeltaRotator.Pitch);
 
 	// rotate shortest path
-	if (DeltaRotator.Yaw < 180) {
+	if (FMath::Abs(DeltaRotator.Yaw) < 180) {
 		Turret->Rotate(DeltaRotator.Yaw);
 	}
 	else {
@@ -83,12 +85,12 @@ bool UTankAimingComponent::IsBarrelMoving() {
 	if (!ensure(Barrel)) return false;
 
 	auto BarrelForward = Barrel->GetForwardVector();
-	return !BarrelForward.Equals(AimDirection, 0.01f);
+	return !BarrelForward.Equals(AimDirection, 0.1f);
 }
 
 void UTankAimingComponent::Fire() {
 
-	if (FiringState != EFiringState::RELOADING) {
+	if (FiringState == EFiringState::LOCKED || FiringState == EFiringState::AIMING) {
 		if (!ensure(Barrel)) { return; }
 		if (!ensure(ProjectileBlueprint)) {	return; }
 
@@ -96,9 +98,14 @@ void UTankAimingComponent::Fire() {
 		auto Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileBlueprint, Barrel->GetSocketLocation(FName("Projectile")), Barrel->GetSocketRotation(FName("Projectile")));
 		Projectile->LaunchProjectile(LaunchSpeed);
 		LastFireTime = FPlatformTime::Seconds();
+		RoundsLeft--;
 	}
 }
 
 EFiringState UTankAimingComponent::GetFiringState() const {
 	return FiringState;
+}
+
+int UTankAimingComponent::GetRoundsLeft() const {
+	return RoundsLeft;
 }
