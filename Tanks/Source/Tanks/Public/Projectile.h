@@ -8,6 +8,7 @@
 #include "Projectile.generated.h"
 
 class UParticleSystemComponent;
+class URadialForceComponent;
 
 UCLASS()
 class TANKS_API AProjectile : public AActor
@@ -26,7 +27,10 @@ public:
 	void LaunchProjectile(float speed);
 
 private:
-	UProjectileMovementComponent* ProjectileMovement = nullptr;
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+
+	void OnTimerExpire();
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* CollisionMesh = nullptr;
@@ -36,4 +40,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UParticleSystemComponent* ImpactBlast = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	URadialForceComponent* ExplosionForce = nullptr;
+	
+	UProjectileMovementComponent* ProjectileMovement = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	float DestroyDelay = 3.0f;
 };
