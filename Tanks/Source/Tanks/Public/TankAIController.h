@@ -22,4 +22,8 @@ protected:
 	float AcceptanceRadius = 8000.0f;
 	
 private:
+	virtual void SetPawn(APawn* InPawn) override; // called when the AI tank is possessed
+
+	UFUNCTION()
+	void OnTankDeath();
 };
